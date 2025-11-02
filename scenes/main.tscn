@@ -1,17 +1,18 @@
-[gd_scene load_steps=11 format=3 uid="uid://d1m4hb8ng5tue"]
+[gd_scene load_steps=15 format=3 uid="uid://d1m4hb8ng5tue"]
 
 [ext_resource type="Texture2D" uid="uid://dqqv14a62wilq" path="res://assets/chess-pattern.png" id="1_1arga"]
+[ext_resource type="PackedScene" uid="uid://dy3feos1bmcpt" path="res://scenes/interactable_box.tscn" id="2_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://1lp08lmtqvdj" path="res://assets/autumn_field_puresky_2k.hdr" id="2_qxk05"]
+[ext_resource type="Texture2D" uid="uid://bi4qhpaqw4kgi" path="res://assets/interact_icon.png" id="2_tipki"]
+[ext_resource type="Script" uid="uid://br686s1kqvw2k" path="res://scripts/interact_icon.gd" id="3_85g3d"]
 [ext_resource type="PackedScene" uid="uid://cbhutiuttlo47" path="res://scenes/player.tscn" id="3_jyhfs"]
 [ext_resource type="Script" uid="uid://c74gp51akxuuf" path="res://scripts/label.gd" id="4_q8umo"]
+[ext_resource type="Shader" uid="uid://cljlo1awhky1p" path="res://assets/color_quantization.gdshader" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://cwtvi0b8hgsi5" path="res://assets/standing_idle.tscn" id="6_tefeu"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mavg6"]
 albedo_texture = ExtResource("1_1arga")
 uv1_scale = Vector3(3000, 3000, 3000)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_jyhfs"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_tbgi4"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5s16p"]
 panorama = ExtResource("2_qxk05")
@@ -24,7 +25,50 @@ radiance_size = 2
 background_mode = 2
 sky = SubResource("Sky_6es57")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
+shader = ExtResource("5_tbgi4")
+shader_parameter/level1 = Color(0.044955462, 1.0829419e-06, 0.29050368, 1)
+shader_parameter/level2 = Color(2.2332668e-05, 0.03205874, 0.56301796, 1)
+shader_parameter/level3 = Color(0, 0, 1, 1)
+shader_parameter/level4 = Color(0.37925622, 1.6412317, 1.6492698, 1)
+shader_parameter/threshold1 = 0.1050000049875
+shader_parameter/threshold2 = 0.59600002831
+shader_parameter/threshold3 = 0.9070000430825
+
 [node name="Main" type="Node3D"]
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI" node_paths=PackedStringArray("player")]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 26.0
+offset_right = 229.0
+offset_bottom = 206.0
+script = ExtResource("4_q8umo")
+player = NodePath("../../player")
+
+[node name="InteractIcon" type="TextureRect" parent="UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.5
+offset_top = -35.512756
+offset_right = 31.5
+offset_bottom = 35.512756
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_tipki")
+script = ExtResource("3_85g3d")
 
 [node name="Stage" type="Node3D" parent="."]
 
@@ -54,18 +98,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.994814, 0.5, 0)
 use_collision = true
 size = Vector3(6.0073237, 1, 1)
 
-[node name="Box" type="RigidBody3D" parent="Stage"]
+[node name="InteractableBox" parent="Stage" instance=ExtResource("2_o6xl0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 0)
-disable_mode = 2
-collision_layer = 4
-collision_mask = 5
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Stage/Box"]
-process_physics_priority = 1
-shape = SubResource("BoxShape3D_jyhfs")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Stage/Box"]
-mesh = SubResource("BoxMesh_tbgi4")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_g2awb")
@@ -80,10 +114,16 @@ ground_acceleration = 5.0
 jump_velocity = 5.5
 push_multiplier = 4.0
 
-[node name="Label" type="Label" parent="." node_paths=PackedStringArray("player")]
-offset_left = 28.0
-offset_top = 26.0
-offset_right = 229.0
-offset_bottom = 206.0
-script = ExtResource("4_q8umo")
-player = NodePath("../player")
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_tefeu")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Standing Idle" parent="." instance=ExtResource("6_tefeu")]
+transform = Transform3D(-0.8266781, 0, -0.5626751, 0, 1, 0, 0.5626751, 0, -0.8266781, 1.1720085, 0.00035128038, 2.485416)

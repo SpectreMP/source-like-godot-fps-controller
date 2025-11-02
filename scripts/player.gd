@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 @onready var head = $Head
+@onready var interaction_ray = $Head/interaction_ray
 
 @export var mouse_sensitivity = 0.25
 
@@ -22,7 +23,9 @@ extends CharacterBody3D
 @export var crouch_speed = 0.5
 
 
-var is_dead:bool= false
+var is_dead:bool = false
+var can_interact:bool = false
+var interactive_object = null
 
 
 func accelerate(wishdir:Vector3, wishspeed:float, accel:float, delta:float) -> void:
@@ -40,14 +43,14 @@ func accelerate(wishdir:Vector3, wishspeed:float, accel:float, delta:float) -> v
 	addspeed = wishspeed - currentspeed
 
 	#If not going to add any speed, done
-	if (addspeed <= 0):
+	if addspeed <= 0:
 		return
 
 	#Determine amount of acceleration
 	accelspeed = accel * delta * wishspeed * frictionAmount
 
 	#Cap at addspeed
-	if (accelspeed > addspeed):
+	if accelspeed > addspeed:
 		accelspeed = addspeed
 	
 	#Adjust velocity
@@ -62,7 +65,7 @@ func airAccelerate(wishdir:Vector3, wishspeed:float, accel:float, delta:float) -
 	if is_dead:
 		return
 	
-	if (wishspeed > 30):
+	if wishspeed > 30:
 		wishspeed = 30
 	
 	#Determine veer amount
@@ -72,14 +75,14 @@ func airAccelerate(wishdir:Vector3, wishspeed:float, accel:float, delta:float) -
 	addspeed = wishspeed - currentspeed
 
 	#If not adding any, done
-	if (addspeed <= 0):
+	if addspeed <= 0:
 		return
 
 	#Determine acceleration speed after acceleration
 	accelspeed = accel * wishspeed * delta * frictionAmount
 
 	#Cap it
-	if (accelspeed > addspeed):
+	if accelspeed > addspeed:
 		accelspeed = addspeed
 	
 	#Adjust velocity
@@ -105,7 +108,7 @@ func friction(delta) -> void:
 		drop += control * localFriction * delta
 	
 	newspeed = speed - drop
-	if (newspeed < 0):
+	if newspeed < 0:
 		newspeed = 0
 
 	newspeed /= speed
@@ -136,6 +139,19 @@ func _input(event: InputEvent) -> void:
 		head.rotate_x(deg_to_rad(-event.relative.y * mouse_sensitivity))
 		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
 
+
+func _process(delta: float) -> void:
+	if interaction_ray.is_colliding():
+		can_interact = true
+		interactive_object = interaction_ray.get_collider()
+	else:
+		can_interact = false
+		interactive_object = null
+	print_debug(interactive_object)
+	
+	if Input.is_action_just_pressed("interact") and can_interact:
+		interactive_object.on_interact()
+	
 
 func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backwards")

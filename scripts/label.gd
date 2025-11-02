@@ -9,5 +9,5 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	text = "Speed: " + str(Vector2(player.velocity.x, player.velocity.z).length())
+	text = "Speed: " + str(Vector2(player.velocity.x, player.velocity.z).length()) + "\nHeight: " + str(player.position.y) + "\nCan interact: " + str(player.can_interact)
 	pass

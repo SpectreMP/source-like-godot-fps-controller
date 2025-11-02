@@ -10,7 +10,7 @@ disable_mode = 2
 script = ExtResource("1_3vyb7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.915, 0)
 shape = SubResource("CylinderShape3D_3vyb7")
 
 [node name="Head" type="Node3D" parent="."]
@@ -18,3 +18,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.64, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 fov = 100.0
+
+[node name="interaction_ray" type="RayCast3D" parent="Head"]
+target_position = Vector3(0, 0, -3)
+collision_mask = 8
+collide_with_areas = true
